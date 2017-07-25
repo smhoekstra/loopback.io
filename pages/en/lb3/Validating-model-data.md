@@ -96,6 +96,12 @@ Every model attached to a persistent data source has validations methods mixed i
         <p>Validate if a value for a property is a Date. Requires a model value for property to be of type Date.</p>
       </td>
     </tr>
+    <tr>
+      <td><a href="https://apidocs.strongloop.com/loopback-datasource-juggler/#validatable-validate" class="external-link" rel="nofollow">validate</a></td>
+      <td>
+        <p>Validate using custom validation function.</p>
+      </td>
+    </tr>
   </tbody>
 </table>
 
@@ -119,6 +125,25 @@ module.exports = function(user) {
   user.validatesExclusionOf('domain', {in: ['www', 'billing', 'admin']});
   user.validatesNumericalityOf('age', {int: true});
   user.validatesUniquenessOf('email', {message: 'email is not unique'});
+  
+  // custom validation
+  function arrayPropertyValidation(err) {
+    let instance = this;
+    let arrayProperty = instance.arrayProperty;
+
+    if (!(arrayProperty)) return err();
+    if (typeof arrayProperty != 'object') return err();
+
+    function validValue(property) {
+      return property === 'valid 1' || direction === 'valid 2';
+    }
+    arrayProperty.forEach(function(property) {
+      if (!validValue(property)) err();
+    });
+
+    return true;
+  }
+  user.validate('arrayProperty', arrayPropertyValidation, {message: 'ArrayProperty is not valid'});
 };
 ```
 
